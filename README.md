@@ -1,7 +1,7 @@
 # Тестовое задание для разработчика
 
-1. Есть таблица платежей пользователей:
-
+## 1. Есть таблица платежей пользователей:
+```sql
 CREATE TABLE payments (
 `id` INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 `student_id` INT NOT NULL,
@@ -9,18 +9,18 @@ CREATE TABLE payments (
 `amount` FLOAT DEFAULT 0,
 INDEX `student_id` (`student_id`)
 );
-
+```
 Необходимо составить запрос, который находит пользователя, чья сумма платежей находится на втором месте после максимальной.
 
-Решение:
-
+### Решение:
+```sql
 SELECT student_id FROM payments
 GROUP BY student_id
 ORDER BY SUM(amount) DESC
 LIMIT 1,1
-
-2. Есть две таблицы. Первая содержит основные данные по студентам:
-
+```
+## 2. Есть две таблицы. Первая содержит основные данные по студентам:
+```sql
 CREATE TABLE student (
 `id` INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 `name` VARCHAR(20) NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE student (
 `gender` ENUM('male', 'female', 'unknown') DEFAULT 'unknown',
 INDEX `gender` (`gender`)
 );
-
+```
 Вторая содержит историю статусов студентов, где последний по хронологии статус является текущим:
-
+```sql
 CREATE TABLE student_status (
 `id` INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
 `student_id` INT NOT NULL,
@@ -39,30 +39,30 @@ CREATE TABLE student_status (
 INDEX `student_id` (`student_id`),
 INDEX `datetime` (`datetime`)
 );
-
+```
 
 Необходимо показать имена и фамилии всех студентов, чей пол до сих не известен (gender = 'unknown') и они сейчас находятся на каникулах (status = ‘vacation’).
 
-Решение:
-
+### Решение:
+```sql
 SELECT name, surname
 FROM student s
 JOIN student_status ss ON (s.id = ss.student_id)
 JOIN (SELECT max(id) AS id FROM student_status GROUP BY student_id) maxid ON (maxid.id = ss.id)
 WHERE gender = 'unknown' AND status = 'vacation'
+```
+## 3. Используя три предыдущие таблицы, найти имена и фамилии всех студентов, которые заплатили не больше трех раз и перестали учиться (status = ‘lost’). Нулевые платежи (amount = 0) не учитывать.
 
-3. Используя три предыдущие таблицы, найти имена и фамилии всех студентов, которые заплатили не больше трех раз и перестали учиться (status = ‘lost’). Нулевые платежи (amount = 0) не учитывать.
-
-Решение:
-
+### Решение:
+```sql
 SELECT name, surname
 FROM student s
 JOIN student_status ss ON (s.id = ss.student_id)
 JOIN (SELECT max(id) AS id FROM student_status GROUP BY student_id) maxid ON (maxid.id = ss.id)
 JOIN (SELECT student_id FROM payments WHERE amount != 0 GROUP BY student_id HAVING count(*) <= 3) p ON (p.student_id = s.id)
 WHERE status = 'lost'
-
-И еще одна задача
+```
+## И еще одна задача
 
 В одном файле хранятся ID пользователей и время их заходов на сайт за 5 лет существования сайта в произвольном порядке. Известно, что существует порядка миллиона пользователей, четверть из которых были активными. Активные пользователи в среднем по 100 раз в день заходили на какую-либо страницу сайта.
 
@@ -82,7 +82,7 @@ WHERE status = 'lost'
 1234567890 2013-03-08 12:26:09
 1234567890 2014-01-01 00:00:34
 
-Решение:
+### Решение:
 
 Посчитаем кол-во записей и размер файла:
 1000000 + 250000*100*365*5 = 45626000000 записей
